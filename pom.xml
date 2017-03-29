@@ -1,0 +1,250 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<packaging>jar</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>collabthings.growinurban</name>
+	<url>http://maven.apache.org</url>
+	<groupId>org.collabthings</groupId>
+	<artifactId>collabthings.growingurban</artifactId>
+
+	<properties>
+		<izpack-standalone.version>4.3.5</izpack-standalone.version>
+		<app.dir>target/webapp</app.dir>
+		<exe.version>0.0.1.0</exe.version>
+	</properties>
+
+	<distributionManagement>
+		<repository>
+			<id>waazdoh-ssh-repository</id>
+			<url>sftp://maven.waazdoh.com/opt/maven/repository</url>
+		</repository>
+	</distributionManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<!-- <version>2.5.1</version> -->
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>2.10</version>
+				<configuration>
+					<sourceDirectory>src</sourceDirectory>
+					<configLocation>src/build/checkstyle.xml</configLocation>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>cobertura-maven-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<formats>
+						<format>html</format>
+						<format>xml</format>
+					</formats>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>buildnumber-maven-plugin</artifactId>
+				<version>1.0-beta-3</version>
+				<executions>
+					<execution>
+						<phase>validate</phase>
+						<goals>
+							<goal>create</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<propertyName>timestamp</propertyName>
+					<format>{0,date,yyyyMMDD}</format>
+					<items>
+						<item>timestamp</item>
+					</items>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<id>default-cli</id>
+						<phase>install</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<!-- -->
+								<zip destfile="${project.build.directory}/nsis/files/bin.zip">
+									<fileset dir="src/main/app/bin" />
+								</zip>
+								<zip destfile="${project.build.directory}/nsis/files/jdk.zip">
+									<fileset dir="${jdk}" />
+								</zip>
+								<zip destfile="${project.build.directory}/nsis/files/resources.zip">
+									<fileset dir="src/main/resources" />
+								</zip>
+								<copy todir="${project.build.directory}/nsis/">
+									<fileset dir="src/main/msi" />
+								</copy>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+		<!-- Name of the generated WAR file -->
+		<finalName>growingurban-${app.arch}</finalName>
+	</build>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.bluestemsoftware.open.maven.plugin</groupId>
+			<artifactId>launch4j-plugin</artifactId>
+			<version>1.5.0.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.collabthings</groupId>
+			<artifactId>client</artifactId>
+			<version>0.4.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.vafer</groupId>
+			<artifactId>jdeb</artifactId>
+			<version>1.3</version>
+		</dependency>
+
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>mac</id>
+			<activation>
+				<os>
+					<name>mac os x</name>
+				</os>
+			</activation>
+			<properties>
+				<swt.groupId>org.eclipse.swt.carbon</swt.groupId>
+				<swt.artifactId>macosx</swt.artifactId>
+				<app.arch>osx</app.arch>
+			</properties>
+		</profile>
+		<profile>
+			<id>windows</id>
+			<activation>
+				<os>
+					<family>windows</family>
+					<arch>amd64</arch>
+				</os>
+			</activation>
+			<properties>
+				<swt.groupId>org.eclipse.swt</swt.groupId>
+				<swt.artifactId>org.eclipse.swt.win32.win32.x86_64</swt.artifactId>
+				<app.arch>windows_64</app.arch>
+				<doexe>true</doexe>
+				<jdk>${env.JAVA_HOME}</jdk>
+			</properties>
+		</profile>
+		<profile>
+			<id>windows32</id>
+			<activation>
+				<os>
+					<family>windows</family>
+					<arch>x86</arch>
+				</os>
+			</activation>
+			<properties>
+				<swt.groupId>org.eclipse.swt</swt.groupId>
+				<swt.artifactId>org.eclipse.swt.win32.win32.x86</swt.artifactId>
+				<app.arch>windows_32</app.arch>
+				<doexe>true</doexe>
+				<jdk>${env.JAVA_HOME}</jdk>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux64</id>
+			<activation>
+				<os>
+					<family>linux</family>
+					<arch>amd64</arch>
+				</os>
+			</activation>
+			<properties>
+				<swt.groupId>org.eclipse.swt</swt.groupId>
+				<swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</swt.artifactId>
+				<app.arch>linux_64</app.arch>
+				<jdk>${env.JAVA_HOME}</jdk>
+			</properties>
+		</profile>
+		<profile>
+			<id>linux32</id>
+			<activation>
+				<os>
+					<family>linux</family>
+					<arch>x86</arch>
+				</os>
+			</activation>
+			<properties>
+				<swt.groupId>org.eclipse.swt</swt.groupId>
+				<swt.artifactId>org.eclipse.swt.gtk.linux.x86</swt.artifactId>
+				<app.arch>linux_32</app.arch>
+				<jdk>${env.JAVA_HOME}</jdk>
+			</properties>
+		</profile>
+
+	</profiles>
+
+	<repositories>
+		<repository>
+			<id>swt-repo</id>
+			<url>https://swt-repo.googlecode.com/svn/repo/</url>
+		</repository>
+		<repository>
+			<id>waazdoh</id>
+			<name>waazdoh</name>
+			<url>https://maven.waazdoh.com/repository</url>
+		</repository>
+		<repository>
+			<id>jogamp-remote</id>
+			<name>jogamp test mirror</name>
+			<url>http://www.jogamp.org/deployment/maven/</url>
+			<layout>default</layout>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>tycho-installer-plugin-repo</id>
+			<layout>default</layout>
+			<url>https://repository-katmatt.forge.cloudbees.com/snapshot/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+</project>
