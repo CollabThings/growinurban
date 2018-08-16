@@ -14,7 +14,7 @@
 		<app.dir>target/webapp</app.dir>
 		<exe.version>0.0.1.0</exe.version>
 	</properties>
-
+	
 	<distributionManagement>
 		<repository>
 			<id>waazdoh-ssh-repository</id>
@@ -26,7 +26,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<!-- <version>2.5.1</version> -->
+				<version>2.5.1</version>
 				<configuration>
 					<source>1.8</source>
 					<target>1.8</target>
@@ -131,7 +131,7 @@
 		<dependency>
 			<groupId>org.collabthings</groupId>
 			<artifactId>client</artifactId>
-			<version>0.4.1-SNAPSHOT</version>
+			<version>0.5.0-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
